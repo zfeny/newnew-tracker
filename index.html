@@ -26,6 +26,7 @@
         
         .container {
             max-width: 500px;
+            width: calc(100% - 20px);
             margin: 24px auto;
             padding: 0;
         }
@@ -269,10 +270,12 @@
             margin-top: 20px;
             background-color: white;
             border-radius: 8px;
-            padding: 15px 20px;
+            padding: 15px 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             position: relative;
             overflow: visible;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .calendar-title {
@@ -287,11 +290,13 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
             padding: 2px;
+            width: 100%;
         }
         
         .calendar-day {
-            width: 40px;
-            height: 40px;
+            aspect-ratio: 1/1;
+            width: 100%;
+            max-width: 40px;
             background-color: #eee;
             border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -372,6 +377,22 @@
             border-radius: 8px;
         }
         
+        @media (max-width: 450px) {
+            .history-filter {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-date-container {
+                width: 100%;
+            }
+            
+            .filter-select, .filter-date-select, .filter-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+        
         .filter-title {
             font-weight: 500;
             color: #555;
@@ -440,6 +461,18 @@
             margin-top: 15px;
         }
         
+        @media (max-width: 450px) {
+            .year-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .year-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .month-cell {
             background-color: #f9f9f9;
             border-radius: 6px;
@@ -476,11 +509,46 @@
         .weekday-labels {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
+            gap: 4px;
             margin-bottom: 8px;
             font-size: 12px;
             color: #7f8c8d;
             text-align: center;
+            width: 100%;
+        }
+        
+        @media (max-width: 500px) {
+            .weekday-labels {
+                font-size: 10px;
+            }
+            
+            .calendar-day {
+                font-size: 11px;
+            }
+            
+            .calendar-container {
+                padding: 10px 5px;
+            }
+            
+            .month-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .navigation-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .weekday-labels {
+                font-size: 9px;
+            }
+            
+            .calendar-day {
+                font-size: 10px;
+            }
         }
         
         .tooltip {
@@ -495,6 +563,7 @@
             pointer-events: none;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.3);
             width: 280px;
+            max-width: 90vw;
             opacity: 0;
             transition: opacity 0.2s ease, transform 0.2s ease;
             transform: translateY(10px);
@@ -502,6 +571,15 @@
             top: -145px;
             left: 50%;
             margin-left: -140px;
+        }
+        
+        @media (max-width: 350px) {
+            .tooltip {
+                width: 250px;
+                margin-left: -125px;
+                font-size: 11px;
+                padding: 10px 12px;
+            }
         }
         
         .tooltip::after {
@@ -624,7 +702,7 @@
             </div>
             
             <div class="tab-content active" id="log">
-                <p style="text-align: center;">祝愿所有给本项目Star的小伙伴牛子长度翻倍!!</p>
+                <p style="text-align: center;">祝愿所有给本项目Star的小伙伴牛子长长工作少少</p>
                 
                 <a href="https://github.com/zfeny/newnew-tracker" class="github-button" target="_blank">
                     <span class="star-icon">⭐</span> Star on GitHub
@@ -1447,8 +1525,33 @@
             
             tooltip.innerHTML = tooltipContent;
             
+            // 获取视窗宽度
+            const viewportWidth = window.innerWidth;
+            
             // 将工具提示添加到日历单元格元素
             cell.appendChild(tooltip);
+            
+            // 调整小屏幕上的位置
+            if (viewportWidth <= 350) {
+                // 如果视窗太窄，调整位置避免溢出
+                const tooltipWidth = tooltip.offsetWidth;
+                const cellRect = cell.getBoundingClientRect();
+                const leftSpace = cellRect.left;
+                const rightSpace = viewportWidth - (cellRect.left + cellRect.width);
+                
+                // 根据左右空间来调整定位
+                if (leftSpace < tooltipWidth/2 || rightSpace < tooltipWidth/2) {
+                    tooltip.style.left = 'auto';
+                    tooltip.style.right = 'auto';
+                    tooltip.style.marginLeft = '0';
+                    
+                    if (leftSpace < rightSpace) {
+                        tooltip.style.left = '0';
+                    } else {
+                        tooltip.style.right = '0';
+                    }
+                }
+            }
             
             // 添加可见类以触发动画
             setTimeout(() => {
